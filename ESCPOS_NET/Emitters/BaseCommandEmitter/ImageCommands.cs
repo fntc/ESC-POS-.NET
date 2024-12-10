@@ -1,7 +1,5 @@
 using ESCPOS_NET.Emitters.BaseCommandValues;
 using ESCPOS_NET.Utilities;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace ESCPOS_NET.Emitters
 {
@@ -57,16 +55,18 @@ namespace ESCPOS_NET.Emitters
                     break;
             }
 
-            int width;
-            int height;
-            byte[] imageData;
-            using (var img = Image.Load<Rgba32>(image))
-            {
-                imageData = img.ToSingleBitPixelByteArray(maxWidth: maxWidth == -1 ? (int?)null : maxWidth);
-                height = img.Height;
-                width = img.Width;
-            }
+            int width=0;
+            int height=0;
+            byte[] imageData=new byte[0];
+            //TODO: implement without imagesharp
+            // using (var img = Image.Load<Rgba32>(image))
+            // {
+            //     imageData = img.ToSingleBitPixelByteArray(maxWidth: maxWidth == -1 ? (int?)null : maxWidth);
+            //     height = img.Height;
+            //     width = img.Width;
+            // }
 
+            
             byte heightL = (byte)height;
             byte heightH = (byte)(height >> 8);
 

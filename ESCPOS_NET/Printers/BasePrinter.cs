@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using SuperSimpleTcp;
 
 namespace ESCPOS_NET
 {
@@ -71,11 +72,11 @@ namespace ESCPOS_NET
 
         protected void InvokeConnect()
         {
-            Task.Run(() => Connected?.Invoke(this, new ConnectionEventArgs() { IsConnected = true }));
+            Task.Run(() => Connected?.Invoke(this, new ConnectionEventArgs1() { IsConnected = true }));
         }
         protected void InvokeDisconnect()
         {
-            Task.Run(() => Disconnected?.Invoke(this, new ConnectionEventArgs() { IsConnected = false }));
+            Task.Run(() => Disconnected?.Invoke(this, new ConnectionEventArgs1() { IsConnected = false }));
         }
 
         protected virtual void Reconnect()

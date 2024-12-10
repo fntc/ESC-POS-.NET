@@ -1,5 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 	<PropertyGroup>
+<!--		<TargetFrameworks>netstandard2.0;sl5;portable-net45+sl5+win8+wp8</TargetFrameworks>-->
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -11,7 +12,7 @@
 			Allows creating receipts with all common functionality supported.
 		</Description>
 		<Copyright>Copyright 2022 CandL Development, LLC.</Copyright>
-		<PackageLicenseUrl></PackageLicenseUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/lukevp/ESC-POS-.NET</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>epson thermal receipt printing printer usb wifi bluetooth serial esc pos escpos escp esc/pos esc/pos.net esc_pos esc_pos_net esc_pos_usb esc_pos_usb_net</PackageTags>
@@ -29,12 +30,18 @@
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 	  <LangVersion>latestmajor</LangVersion>
 	</PropertyGroup>
-	<ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />		
-		<PackageReference Include="SuperSimpleTcp" Version="3.0.14" />
+		<PackageReference Include="SuperSimpleTcp" Version="3.0.10" />
 		<PackageReference Include="System.IO.Ports" Version="9.0.0" />
 		<PackageReference Include="System.Text.Json" Version="9.0.0" />
 	</ItemGroup>
-
+	<ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.0'">
+		
+	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="System.ComponentModel.Composition" Condition="'$(TargetFramework)' == 'portable-net45+sl5+win8+wp8' OR '$(TargetFramework)' == 'sl5'" />
+	  <Reference Include="System.Json" Condition="'$(TargetFramework)' == 'portable-net45+sl5+win8+wp8' OR '$(TargetFramework)' == 'sl5'" />
+	</ItemGroup>
 </Project>

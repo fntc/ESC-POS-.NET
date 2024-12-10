@@ -1,7 +1,8 @@
 ﻿using ESCPOS_NET.Utils;
-using SimpleTcp;
+
 using System;
 using System.IO;
+using SuperSimpleTcp;
 
 namespace ESCPOS_NET
 {
@@ -9,8 +10,8 @@ namespace ESCPOS_NET
     {
         public Stream ReadStream { get; private set; } = new EchoStream();
         public Stream WriteStream { get; private set; }
-        public event EventHandler<ClientConnectedEventArgs> Connected;
-        public event EventHandler<ClientDisconnectedEventArgs> Disconnected;
+        public event EventHandler<ConnectionEventArgs> Connected;
+        public event EventHandler<ConnectionEventArgs> Disconnected;
         public bool IsConnected => _client?.IsConnected ?? false;
         private SimpleTcpClient _client;
         //public event EventHandler<DataReceivedEventArgs> DataReceived;
@@ -24,17 +25,17 @@ namespace ESCPOS_NET
             ReadStream.ReadTimeout = 1500;
             WriteStream = new InterceptableWriteMemoryStream(bytes => _client.Send(bytes));
         }
-        private void ConnectedEventHandler(object sender, ClientConnectedEventArgs e)
+        private void ConnectedEventHandler(object sender, ConnectionEventArgs e)
         {
             Connected?.Invoke(sender, e);
         }
-        private void DisconnectedEventHandler(object sender, ClientDisconnectedEventArgs e)
+        private void DisconnectedEventHandler(object sender, ConnectionEventArgs e)
         {
             Disconnected?.Invoke(sender, e);
         }
         private void DataReceivedEventHandler(object sender, DataReceivedEventArgs e)
         {
-            ReadStream.Write(e.Data, 0, e.Data.Length);
+            ReadStream.Write(e.Data.Array, 0, e.Data.Count);
         }
         public void ConnectWithRetries(int timeoutMs)
         {
