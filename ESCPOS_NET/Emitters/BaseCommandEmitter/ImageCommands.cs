@@ -1,4 +1,7 @@
+using System;
+using System.Linq;
 using ESCPOS_NET.Emitters.BaseCommandValues;
+using ESCPOS_NET.Extensions;
 using ESCPOS_NET.Utilities;
 
 namespace ESCPOS_NET.Emitters
@@ -39,6 +42,17 @@ namespace ESCPOS_NET.Emitters
 
         public virtual byte[] BufferImage(byte[] image, int maxWidth = -1, bool isLegacy = false, int color = 1)
         {
+            if (image[0] != 'B' || image[1] != 'M' || image[14] != 40 || image[28] != 1)
+            {
+                throw new BitmapFormatException("Please provide image data as 1 bit windows bitmap");
+            }
+
+            int width=BitConverter.ToInt32(image, 18);
+            if (maxWidth < width)
+            {
+                throw new BitmapFormatException("Image is larger than max width");
+            }
+            
             ByteArrayBuilder imageCommand = new ByteArrayBuilder();
 
             byte colorByte;
@@ -54,18 +68,10 @@ namespace ESCPOS_NET.Emitters
                     colorByte = 0x31;
                     break;
             }
-
-            int width=0;
-            int height=0;
-            byte[] imageData=new byte[0];
-            //TODO: implement without imagesharp
-            // using (var img = Image.Load<Rgba32>(image))
-            // {
-            //     imageData = img.ToSingleBitPixelByteArray(maxWidth: maxWidth == -1 ? (int?)null : maxWidth);
-            //     height = img.Height;
-            //     width = img.Width;
-            // }
-
+            
+            var pixelStart = BitConverter.ToInt32(image, 10);
+            int height=BitConverter.ToInt32(image, 22);
+            byte[] imageData = image.Skip(pixelStart).ToArray();
             
             byte heightL = (byte)height;
             byte heightH = (byte)(height >> 8);
