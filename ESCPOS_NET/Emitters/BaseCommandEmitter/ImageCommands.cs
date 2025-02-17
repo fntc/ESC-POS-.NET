@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ESCPOS_NET.Emitters.BaseCommandValues;
 using ESCPOS_NET.Extensions;
@@ -71,10 +72,25 @@ namespace ESCPOS_NET.Emitters
             
             var pixelStart = BitConverter.ToInt32(image, 10);
             int height=BitConverter.ToInt32(image, 22);
-            byte[] imageData = image.Skip(pixelStart).ToArray();
-            
-            byte heightL = (byte)height;
-            byte heightH = (byte)(height >> 8);
+            //Invert as 1 is print (black) and 0 is (white) for the printer, inverse to the bitmap values
+            byte[] imageData = image.Skip(pixelStart).Select(b => (byte)~b).ToArray();
+
+            //Printer expected top-to-bottom which is only present with negative height value in BMP
+            if (height > 0)
+            {
+                List<byte> imageData2 = new();
+                var byteWidthA = (width + 7 & -8) / 8;
+                for (int row = 0; row < height; row++)
+                {
+                    imageData2.InsertRange(0,imageData.Skip(row * byteWidthA).Take(byteWidthA));
+                }
+
+                imageData = imageData2.ToArray();
+            }
+
+            int hAbs = Math.Abs(height);
+            byte heightL = (byte)hAbs;
+            byte heightH = (byte)(hAbs >> 8);
 
             if (isLegacy)
             {
